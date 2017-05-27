@@ -1,6 +1,8 @@
 # ifndef __BELLA_H
 # define __BELLA_H
 
+# include <time.h>
+
 # define VK_HOTKEY1     0x01
 # define VK_HOTKEY2     0x02
 # define VK_HOTKEY3     0x03
@@ -38,5 +40,7 @@
 # define VK_X   0x58
 # define VK_Y   0x59
 # define VK_Z   0x5A
+
+struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 millisecond
 
 # endif
