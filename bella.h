@@ -1,6 +1,7 @@
 # ifndef __BELLA_H
 # define __BELLA_H
 
+# include <Windows.h>
 # include <time.h>
 
 # define VK_HOTKEY1     0x01
@@ -13,6 +14,17 @@
 # define VK_HOTKEY8     0x08
 # define VK_HOTKEY9     0x09
 # define VK_HOTKEY10    0x0A
+
+# define VK_0   0x30
+# define VK_1   0x31
+# define VK_2   0x32
+# define VK_3   0x33
+# define VK_4   0x34
+# define VK_5   0x35
+# define VK_6   0x36
+# define VK_7   0x37
+# define VK_8   0x38
+# define VK_9   0x39
 
 # define VK_A   0x41
 # define VK_B   0x42
@@ -41,6 +53,38 @@
 # define VK_Y   0x59
 # define VK_Z   0x5A
 
-struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 millisecond
+# define size(arr)   (sizeof(arr) / sizeof(arr[0])
+
+struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
+
+// Input to send (Ctrl+c copy key)
+const INPUT copy[] = {
+    { INPUT_KEYBOARD, .ki = { .wVk = VK_LCONTROL,   .dwFlags = 0 }},
+    { INPUT_KEYBOARD, .ki = { .wVk = VK_C,          .dwFlags = 0 }},
+    { INPUT_KEYBOARD, .ki = { .wVk = VK_C,          .dwFlags = KEYEVENTF_KEYUP }},
+    { INPUT_KEYBOARD, .ki = { .wVk = VK_LCONTROL,   .dwFlags = KEYEVENTF_KEYUP }},
+};
+
+typedef struct key {
+    const int keys[2];
+} key;
+
+const key hotkeys[] = {
+    [VK_HOTKEY1] = { .keys = { VK_MENU, VK_1 }},
+    [VK_HOTKEY2] = { .keys = { VK_MENU, VK_2 }},
+    [VK_HOTKEY3] = { .keys = { VK_MENU, VK_3 }},
+    [VK_HOTKEY4] = { .keys = { VK_MENU, VK_4 }},
+    [VK_HOTKEY5] = { .keys = { VK_MENU, VK_5 }},
+};
+
+int iskeydown(int hotkey[]);
+
+int download_hl(void);
+int download_clipboard(void);
+int download_bellaslist(void);
+int store_hl(void);
+int store_hl_clipboard(void);
+
+int build_hotkeys(void);
 
 # endif
