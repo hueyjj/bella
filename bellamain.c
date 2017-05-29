@@ -20,7 +20,8 @@ static void usage(void)
            "    hotkey2     <control 2>    Download media from url in clipboard.\n"
            "    hotkey3     <control 3>    Download all in ./bellaslist.txt\n"
            "    hotkey4     <control 4>    Store highlighted content to ./bellaslist.txt\n"
-           "    hotkey5     <control 5>    Store highlighted content to ./bellaslist.txt and to clip board\n"
+           "    hotkey5     <control `>    Exit bella\n"
+           "    hotkey6     <control 0>    Exit bella\n"
            );
 
     printf("Options:\n"
@@ -50,9 +51,10 @@ static void print_last_error(void)
 int main(int argc, char *argv[])
 {
     setbuf(stdout, NULL);
+
     opterr = 0;
 
-    static struct option long_options[] = {
+    const struct option long_options[] = {
         {"help", no_argument, 0, 'h'}
     };
 
@@ -72,101 +74,71 @@ int main(int argc, char *argv[])
         }
     }
 
-    build_hotkeys();
+    printf( "Checking if processor is available..." );
+    if ( system(NULL) ) puts ("Ok");
+    else                
+    { 
+        fprintf( stderr, "Unable to spawn subprocess via shell\n" );
+        exit (EXIT_FAILURE); 
+    }
 
+    // Register hot keys
+    reghotkeys();
+
+    int *key;
     MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0) > 0)
     {
         if (msg.message == WM_HOTKEY)
         {
-            switch(msg.wParam)
+            switch (msg.wParam)
             {
-                case(VK_HOTKEY1):
-                    printf("VK_HOTKEY1 entered\n");
+                case (VK_HOTKEY1):
+                    key = (int *) hotkeys[VK_HOTKEY1].keys; 
 
-                    int *key = (int *) hotkeys[VK_HOTKEY1].keys; 
                     while ( ishotkeydown(key) ) { nanosleep(&mssleep, NULL); }
 
-                    printf("LAlt: %d RAlt: %d Alt: %d Ctrl: %d one: %d\n",
-                            GetAsyncKeyState(VK_LMENU),
-                            GetAsyncKeyState(VK_RMENU),
-                            GetAsyncKeyState(VK_MENU),
-                            GetAsyncKeyState(VK_LCONTROL),
-                            GetAsyncKeyState(VK_1));
+                    //printf("LAlt: %d RAlt: %d Alt: %d Ctrl: %d one: %d\n",
+                    //        GetAsyncKeyState(VK_LMENU),
+                    //        GetAsyncKeyState(VK_RMENU),
+                    //        GetAsyncKeyState(VK_MENU),
+                    //        GetAsyncKeyState(VK_LCONTROL),
+                    //        GetAsyncKeyState(VK_1));
 
-                    UINT result = SendInput(4, (LPINPUT) copykey, sizeof(INPUT));
+                    download_hl();
 
-                    printf("Number of events: %d\n", result);
+                    //printf("Number of events: %d\n", result);
 
-                    if (!result) { print_last_error(); }
+                    break;
 
+                case (VK_HOTKEY2):
+                    break;
+
+                case (VK_HOTKEY3):
+                    break;
+
+                case (VK_HOTKEY4):
+                    break;
+
+                case (VK_HOTKEY5):
+                    printf( "Goodbye! Bella is leaving you.\n" );
                     exit( EXIT_SUCCESS );
+                    break;
 
+                case (VK_HOTKEY6):
+                    printf( "Sayonora! Bella will see you on the other side.\n" );
+                    exit( EXIT_SUCCESS );
                     break;
-                case(VK_HOTKEY2):
-                    printf("VK_HOTKEY2 entered\n");
-                    break;
+
                 default:
-                    printf("Something has gone horribly wrong\n");
+                    printf( "Something has gone horribly wrong\n" );
+                    abort();
             }
 
             // remove duplicate hotkey inputs
             while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)); 
         }
-
     }
 
-    HWND cbOwner = GetClipboardOwner();
-    if (OpenClipboard(cbOwner)) 
-    {
-        printf("Opened clipboard\n");
-    }
-    else
-    {
-        fprintf(stderr, "Failed to open clipboard\n");
-    }
-        
-    HANDLE clipboard;
-    clipboard = GetClipboardData(CF_TEXT);
-
-    if (!clipboard) 
-    { 
-        fprintf(stderr, "clipboard error\n"); 
-        print_last_error(); 
-        exit( EXIT_FAILURE ); 
-    }
-    else 
-    { 
-        LPSTR text;
-        text = GlobalLock(clipboard);
-        if (!text)
-        {
-            fprintf(stderr, "invalid text?\n");
-            exit( EXIT_FAILURE);
-        }
-        printf("in clipboard: %s\n", text); 
-
-        GlobalUnlock(clipboard);
-    }
-    
-    CloseClipboard();
-
-    //int i;
-    //printf ("Checking if processor is available...");
-    //if (system(NULL)) puts ("Ok");
-    //else exit (EXIT_FAILURE);
-    //printf ("Executing system command...\n");
-    //FILE *s = popen("youtube-dl  -o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata https://www.youtube.com/watch?v=UXGJCzGx8w4", "r"); 
-
-    //char buffer[256];
-    //while (fgets(buffer, 256, s) != NULL)
-    //{
-    //    //printf("buffer: %s\n", buffer);
-    //}
-
-    ////i= system ("youtube-dl  -o \"%(title)s.%(ext)s\" -i --format m4a \
-    //        --embed-thumbnail --add-metadata https://www.youtube.com/watch?v=UXGJCzGx8w4");
-    //printf ("The value returned was: %d.\n",i);
-    //pclose(s);
     return 0;
 }

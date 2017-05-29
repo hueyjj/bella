@@ -4,6 +4,8 @@
 # include <Windows.h>
 # include <time.h>
 
+# define VK_COPY        0x00
+
 # define VK_HOTKEY1     0x01
 # define VK_HOTKEY2     0x02
 # define VK_HOTKEY3     0x03
@@ -70,21 +72,23 @@ typedef struct key {
 } key;
 
 static const key hotkeys[] = {
+    [VK_COPY]    = { .keys = { VK_CONTROL, VK_C }},
     [VK_HOTKEY1] = { .keys = { VK_CONTROL, VK_1 }},
     [VK_HOTKEY2] = { .keys = { VK_CONTROL, VK_2 }},
     [VK_HOTKEY3] = { .keys = { VK_CONTROL, VK_3 }},
     [VK_HOTKEY4] = { .keys = { VK_CONTROL, VK_4 }},
     [VK_HOTKEY5] = { .keys = { VK_CONTROL, VK_5 }},
+    [VK_HOTKEY6] = { .keys = { VK_CONTROL, VK_6 }},
 };
 
 int ishotkeydown(int hotkey[]);
 
-int download_hl(void);
+void download_hl(void);
 int download_clipboard(void);
 int download_bellaslist(void);
 int store_hl(void);
 int store_hl_clipboard(void);
 
-int build_hotkeys(void);
+int reghotkeys(void);
 
 # endif
