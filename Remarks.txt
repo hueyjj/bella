@@ -1,0 +1,6 @@
+Known issues:
+- Unable to set bindings starting with alt modifier. 
+    For some reason, the binding interferes with the copy-to-clipboard operation.  When alt+somekey is pressed, releasing somekey 
+    and then alt modifier allows the copy-to-clipboard operation to work. But when the alt modifier is released first and then 
+    somekey, the copy-to-clipboard operation fails. I actually have no clue why it fails. Google searches escape me.
+    Somethings things I have tried but not limited to: GetKeyState(), GetAsyncKeyState(), GetKeyboardState(), SetKeyboardState().

@@ -53,12 +53,12 @@
 # define VK_Y   0x59
 # define VK_Z   0x5A
 
-# define size(arr)   (sizeof(arr) / sizeof(arr[0])
+# define size(arr)  (sizeof(arr) / sizeof(arr[0])) 
 
-struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
+static struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
 
 // Input to send (Ctrl+c copy key)
-const INPUT copy[] = {
+static const INPUT copykey[] = { 
     { INPUT_KEYBOARD, .ki = { .wVk = VK_LCONTROL,   .dwFlags = 0 }},
     { INPUT_KEYBOARD, .ki = { .wVk = VK_C,          .dwFlags = 0 }},
     { INPUT_KEYBOARD, .ki = { .wVk = VK_C,          .dwFlags = KEYEVENTF_KEYUP }},
@@ -66,18 +66,18 @@ const INPUT copy[] = {
 };
 
 typedef struct key {
-    const int keys[2];
+    int keys[2];
 } key;
 
-const key hotkeys[] = {
-    [VK_HOTKEY1] = { .keys = { VK_MENU, VK_1 }},
-    [VK_HOTKEY2] = { .keys = { VK_MENU, VK_2 }},
-    [VK_HOTKEY3] = { .keys = { VK_MENU, VK_3 }},
-    [VK_HOTKEY4] = { .keys = { VK_MENU, VK_4 }},
-    [VK_HOTKEY5] = { .keys = { VK_MENU, VK_5 }},
+static const key hotkeys[] = {
+    [VK_HOTKEY1] = { .keys = { VK_CONTROL, VK_1 }},
+    [VK_HOTKEY2] = { .keys = { VK_CONTROL, VK_2 }},
+    [VK_HOTKEY3] = { .keys = { VK_CONTROL, VK_3 }},
+    [VK_HOTKEY4] = { .keys = { VK_CONTROL, VK_4 }},
+    [VK_HOTKEY5] = { .keys = { VK_CONTROL, VK_5 }},
 };
 
-int iskeydown(int hotkey[]);
+int ishotkeydown(int hotkey[]);
 
 int download_hl(void);
 int download_clipboard(void);
