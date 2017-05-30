@@ -172,6 +172,7 @@ void download_bellaslist(void)
     {
         pERROR("download_bellaslist: Unable to open bellaslist\n");
         error("download_bellaslist: Unable to open bellaslist");
+        fclose(infile);
         return;
     }
 
