@@ -1,5 +1,6 @@
 CC		= gcc
-FLAGS 	= --std=c99
+DEBUG	= -DDEBUGPRINT -Wall
+FLAGS 	= --std=c99 -mwindows -O2 
 
 all: bella
 	
@@ -11,6 +12,9 @@ bellamain.o: 	bellamain.c bella.h
 
 bella.o: 		bella.c bella.h
 	$(CC)	$(FLAGS) -c bella.c
+
+debug: FLAGS += $(DEBUG)
+debug: bella
 
 clean: 
 	rm -f bella.exe bellamain.o bella.o

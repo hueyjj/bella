@@ -2,7 +2,18 @@
 # define __BELLA_H
 
 # include <Windows.h>
+# include <Shellapi.h>
 # include <time.h>
+
+# ifdef DEBUGPRINT
+# define pDEBUG(...) printf(__VA_ARGS__)
+# define pERROR(...) fprintf(stderr, __VA_ARGS__)
+# else
+# define pDEBUG(...) 
+# define pERROR(...)
+# endif
+
+# define size(arr)  (sizeof(arr) / sizeof(arr[0])) 
 
 # define VK_COPY        0x00
 
@@ -55,9 +66,7 @@
 # define VK_Y   0x59
 # define VK_Z   0x5A
 
-# define size(arr)  (sizeof(arr) / sizeof(arr[0])) 
-
-static struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
+static const struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
 
 // Input to send (Ctrl+c copy key)
 static const INPUT copykey[] = { 
@@ -84,10 +93,10 @@ static const key hotkeys[] = {
 int ishotkeydown(int hotkey[]);
 
 void download_hl(void);
-int download_clipboard(void);
-int download_bellaslist(void);
-int store_hl(void);
-int store_hl_clipboard(void);
+void download_clipboard(void);
+void download_bellaslist(void);
+void store_hl(void);
+void store_hl_clipboard(void);
 
 int reghotkeys(void);
 

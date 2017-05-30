@@ -10,29 +10,35 @@
 
 # include "bella.h"
 
-static void copy(void);
+# define MAX_SZ 2048 
+
+static int copy(void);
 static char *getclipboardS(void);
 static void download(const char *url);
 
 static const char savedir[] = "./saves";
 static const short mostsigbit = (1 << 15);
 
-static void copy(void)
+static int copy(void)
 {
     UINT result;
-    const int maxretry = 10;
+    const int maxretry = 20;
     int retry = 0;
-    char *prev, *curr;
+    char prev[MAX_SZ], curr[MAX_SZ];
 
-    puts("prev"); prev = getclipboardS();
+    //prev = getclipboardS();
+    strcpy(prev, getclipboardS());
 
     do 
     {
+        pDEBUG("prev: %s\n", prev);
+        pDEBUG("curr: %s\n", curr);
         retry++;
         result = SendInput(4, (LPINPUT) copykey, sizeof(INPUT));
         for (int i = 0; i < 5; ++i) nanosleep(&mssleep, NULL); // 500 ms
-        puts("curr");
-    } while (curr = getclipboardS(), strcmp(prev, curr) == 0 && retry < maxretry);
+    } while (strcpy(curr, getclipboardS()), strcmp(prev, curr) == 0 && retry < maxretry);
+
+    return (retry < maxretry) ? true : false;
 }
 
 /* Retrieves text from clipboard */
@@ -41,7 +47,7 @@ static char *getclipboardS(void)
     HWND cbOwner = GetClipboardOwner();
     if (!OpenClipboard(cbOwner)) 
     {
-        fprintf(stderr, "Failed to open clipboard\n");
+        pERROR("Failed to open clipboard\n");
     }
         
     HANDLE clipboard;
@@ -49,7 +55,7 @@ static char *getclipboardS(void)
 
     if (!clipboard) 
     { 
-        fprintf(stderr, "Clipboard handle error\n"); 
+        pERROR("Clipboard handle error\n"); 
         return (char *) 0;
     }
 
@@ -57,10 +63,9 @@ static char *getclipboardS(void)
     text = GlobalLock(clipboard);
     if (!text)
     {
-        fprintf(stderr, "Unable to read text from clipboard\n");
+        pERROR("Unable to read text from clipboard\n");
         return (char *) 0;
     }
-    printf("\nIn clipboard: %s\n", text); 
 
     GlobalUnlock(clipboard);
     CloseClipboard();
@@ -70,26 +75,34 @@ static char *getclipboardS(void)
 
 static void download(const char *url)
 {
-
     struct stat sb = {0};
-    if ( !(stat( savedir, &sb) == 0 && S_ISDIR(sb.st_mode)) )
-        mkdir( savedir );
+    if (stat(savedir, &sb) != 0 || !S_ISDIR(sb.st_mode))
+        mkdir(savedir);
 
-    char *cmd;
-    const char *youtubedl = "youtube-dl  -o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
-    
-    asprintf(&cmd, "(cd %s && %s %s)", savedir, youtubedl, url);
+    //char *cmd;
+    const char *youtube = "youtube-dl";
+    const char *param = "-o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
+    char *paramb;
 
-    printf("\nExecuting... %s\n\n", cmd); 
+    asprintf(&paramb, "%s %s", param, url);
 
-    FILE *s = popen(cmd, "r"); 
+    //const char *youtubedl = "youtube-dl -o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
+    //asprintf(&cmd, "(cd %s && %s %s)", savedir, youtubedl, url);
+    //pDEBUG("\nExecuting...\n%s\n\n", cmd); 
+
+
+    pDEBUG("\nExecuting..\n\n");
+    int sh = (int) ShellExecute(NULL, "open", youtube, paramb, savedir, SW_HIDE);
+    pDEBUG("shell execute code: %d ( > 32 == success)\n", sh);
+
+    //FILE *s = popen(cmd, "r"); 
 
     // Check sub process output
-    char buffer[1024];
-    while (fgets(buffer, 1024, s) != NULL)
-        printf("%s", buffer);
+    //char buffer[2048];
+    //while (fgets(buffer, 1024, s) != NULL);
+    //    pDEBUG("%s", buffer);
 
-    pclose(s);
+    //pclose(s);
 }
 
 int ishotkeydown(int hotkey[])
@@ -105,7 +118,21 @@ int ishotkeydown(int hotkey[])
 
 void download_hl(void)
 {
-    copy();
+    if (copy() == false)
+    {
+        pERROR("Failed to copy\n");
+        return;
+    }
+
+    // TODO add a way to verify if downloaded and if it's the right file
+
+    char *url = getclipboardS();
+    pDEBUG("In clipboard: %s\n", url);
+    download(url);
+}
+
+void download_clipboard(void)
+{
     char *url = getclipboardS();
     download(url);
 }
@@ -116,37 +143,37 @@ int reghotkeys(void)
 
     if (!RegisterHotKey(NULL, VK_HOTKEY1, MOD_CONTROL, VK_1))
     {
-        fprintf(stderr, "Failed to register hotkey 1\n");
+        pERROR("Failed to register hotkey 1\n");
         exitflag = 1;
     }
     
     if (!RegisterHotKey(NULL, VK_HOTKEY2, MOD_CONTROL, VK_2))
     {
-        fprintf(stderr, "Failed to register hotkey 2\n");
+        pERROR("Failed to register hotkey 2\n");
         exitflag = 1;
     }
 
     if (!RegisterHotKey(NULL, VK_HOTKEY3, MOD_CONTROL, VK_3))
     {
-        fprintf(stderr, "Failed to register hotkey 3\n");
+        pERROR("Failed to register hotkey 3\n");
         exitflag = 1;
     }
 
     if (!RegisterHotKey(NULL, VK_HOTKEY4, MOD_CONTROL, VK_4))
     {
-        fprintf(stderr, "Failed to register hotkey 4\n");
+        pERROR("Failed to register hotkey 4\n");
         exitflag = 1;
     }
 
     if (!RegisterHotKey(NULL, VK_HOTKEY5, MOD_CONTROL, VK_OEM_3)) // Control + `
     {
-        fprintf(stderr, "Failed to register hotkey 5\n");
+        pERROR("Failed to register hotkey 5\n");
         exitflag = 1;
     }
 
-    if ( !RegisterHotKey(NULL, VK_HOTKEY6, MOD_CONTROL, VK_0) )
+    if (!RegisterHotKey(NULL, VK_HOTKEY6, MOD_CONTROL, VK_0))
     {
-        fprintf(stderr, "Failed to register hotkey 6\n");
+        pERROR("Failed to register hotkey 6\n");
         exitflag = 1;
     }
     return exitflag;

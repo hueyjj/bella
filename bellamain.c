@@ -13,9 +13,9 @@ static void print_last_error(void);
 
 static void usage(void)
 {
-    printf("Usage: ./bella.exe [OPTIONS]\n\n");
-    printf("Default save directory: ./saves/\n");
-    printf("Default bindings:\n"
+    pDEBUG("Usage: ./bella.exe [OPTIONS]\n\n");
+    pDEBUG("Default save directory: ./saves/\n");
+    pDEBUG("Default bindings:\n"
            "    hotkey1     <control 1>    Download media from highlighted url.\n"
            "    hotkey2     <control 2>    Download media from url in clipboard.\n"
            "    hotkey3     <control 3>    Download all in ./bellaslist.txt\n"
@@ -24,7 +24,7 @@ static void usage(void)
            "    hotkey6     <control 0>    Exit bella\n"
            );
 
-    printf("Options:\n"
+    pDEBUG("Options:\n"
            "    -h, --help              Prints this help text and exit.\n"
            );
 }
@@ -36,13 +36,13 @@ static void print_last_error(void)
     {
         LPSTR messageBuffer = NULL;
         size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, errorMessageID,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-                (LPSTR)&messageBuffer, 0, NULL);
+                                     FORMAT_MESSAGE_FROM_SYSTEM |
+                                     FORMAT_MESSAGE_IGNORE_INSERTS,
+                                     NULL, errorMessageID,
+                                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                                     (LPSTR)&messageBuffer, 0, NULL);
         
-        printf("Last error: %s\n", messageBuffer);
+        pDEBUG("Last error: %s\n", messageBuffer);
 
         LocalFree(messageBuffer);
     }
@@ -50,7 +50,11 @@ static void print_last_error(void)
 
 int main(int argc, char *argv[])
 {
+
+# ifdef DEBUGPRINT
     setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+# endif
 
     opterr = 0;
 
@@ -60,7 +64,7 @@ int main(int argc, char *argv[])
 
     int option, option_index = 0;
     while ( (option = getopt_long(argc, argv, "h", 
-                                long_options, &option_index)) != -1) 
+                                  long_options, &option_index)) != -1) 
     {
         switch (option)
         {
@@ -74,12 +78,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf( "Checking if processor is available..." );
-    if ( system(NULL) ) puts ("Ok");
+    pDEBUG("Checking if processor is available...");
+    if (system(NULL)) pDEBUG("Ok\n");
     else                
     { 
-        fprintf( stderr, "Unable to spawn subprocess via shell\n" );
-        exit (EXIT_FAILURE); 
+        pERROR("Unable to spawn subprocess via shell\n");
+        exit(EXIT_FAILURE); 
     }
 
     // Register hot keys
@@ -91,27 +95,26 @@ int main(int argc, char *argv[])
     {
         if (msg.message == WM_HOTKEY)
         {
+            key = (int *) hotkeys[msg.wParam].keys; 
+            while (ishotkeydown(key)) { nanosleep(&mssleep, NULL); }
+
             switch (msg.wParam)
             {
                 case (VK_HOTKEY1):
-                    key = (int *) hotkeys[VK_HOTKEY1].keys; 
-
-                    while ( ishotkeydown(key) ) { nanosleep(&mssleep, NULL); }
-
-                    //printf("LAlt: %d RAlt: %d Alt: %d Ctrl: %d one: %d\n",
+                    //pDEBUG("LAlt: %d RAlt: %d Alt: %d Ctrl: %d one: %d\n",
                     //        GetAsyncKeyState(VK_LMENU),
                     //        GetAsyncKeyState(VK_RMENU),
                     //        GetAsyncKeyState(VK_MENU),
                     //        GetAsyncKeyState(VK_LCONTROL),
                     //        GetAsyncKeyState(VK_1));
-
+                    
                     download_hl();
 
-                    //printf("Number of events: %d\n", result);
-
+                    //pDEBUG("Number of events: %d\n", result);
                     break;
 
                 case (VK_HOTKEY2):
+                    download_clipboard();
                     break;
 
                 case (VK_HOTKEY3):
@@ -121,17 +124,17 @@ int main(int argc, char *argv[])
                     break;
 
                 case (VK_HOTKEY5):
-                    printf( "Goodbye! Bella is leaving you.\n" );
+                    pDEBUG("\nGoodbye! Bella is leaving you.\n");
                     exit( EXIT_SUCCESS );
                     break;
 
                 case (VK_HOTKEY6):
-                    printf( "Sayonora! Bella will see you on the other side.\n" );
-                    exit( EXIT_SUCCESS );
+                    pDEBUG("\nSayonora! Bella will see you on the other side.\n");
+                    exit(EXIT_SUCCESS);
                     break;
 
                 default:
-                    printf( "Something has gone horribly wrong\n" );
+                    pDEBUG("Something has gone horribly wrong\n");
                     abort();
             }
 
