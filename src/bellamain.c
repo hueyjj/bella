@@ -4,8 +4,8 @@
 # include <string.h>
 # include <unistd.h>
 # include <time.h>
-
 # include <Windows.h>
+
 # include "bella.h"
 
 static void usage(void);

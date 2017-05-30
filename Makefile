@@ -1,5 +1,6 @@
 CC		= gcc
 DEBUG	= -DDEBUGPRINT -Wall
+STATIC	= -static -static-libgcc -static-libstdc++
 FLAGS 	= --std=c99 -mwindows -O2 
 
 all: bella
@@ -16,6 +17,9 @@ bella.o: 		src/bella.c src/bella.h
 
 debug: FLAGS += $(DEBUG)
 debug: bella
+
+static: FLAGS += $(STATIC)
+static: bella
 
 clean: 
 	rm -f bella.exe src/bellamain.o src/bella.o

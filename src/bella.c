@@ -45,7 +45,7 @@ static int copy(void)
         //pDEBUG("curr: %s\n", curr);
         retry++;
         result = SendInput(4, (LPINPUT) copykey, sizeof(INPUT));
-        for (int i = 0; i < 2; ++i) nanosleep(&mssleep, NULL); // 200 ms
+        for (int i = 0; i < 5; ++i) nanosleep(&mssleep, NULL); // 500 ms
     } while (strcpy(curr, getclipboardS()), strcmp(prev, curr) == 0 && retry < maxretry);
 
     return (retry < maxretry) ? true : false;
@@ -144,12 +144,7 @@ int ishotkeydown(int hotkey[])
 
 void download_hl(void)
 {
-    if (copy() == false)
-    {
-        pERROR("Failed to copy\n");
-        error("download_hl: Failed to copy");
-        return;
-    }
+    copy();
 
     // TODO add a way to verify if downloaded and if it's the right file
 
