@@ -87,7 +87,8 @@ static const key hotkeys[] = {
     [VK_HOTKEY3] = { .keys = { VK_CONTROL, VK_3 }},
     [VK_HOTKEY4] = { .keys = { VK_CONTROL, VK_4 }},
     [VK_HOTKEY5] = { .keys = { VK_CONTROL, VK_5 }},
-    [VK_HOTKEY6] = { .keys = { VK_CONTROL, VK_6 }},
+    [VK_HOTKEY6] = { .keys = { VK_CONTROL, VK_OEM_3 }},
+    [VK_HOTKEY7] = { .keys = { VK_CONTROL, VK_0 }},
 };
 
 int ishotkeydown(int hotkey[]);
@@ -96,7 +97,7 @@ void download_hl(void);
 void download_clipboard(void);
 void download_bellaslist(void);
 void store_hl(void);
-void store_hl_clipboard(void);
+void store_clipboard(void);
 
 int reghotkeys(void);
 

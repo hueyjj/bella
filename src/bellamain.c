@@ -13,18 +13,20 @@ static void print_last_error(void);
 
 static void usage(void)
 {
-    pDEBUG("Usage: ./bella.exe [OPTIONS]\n\n");
-    pDEBUG("Default save directory: ./saves/\n");
-    pDEBUG("Default bindings:\n"
+    printf("Usage: ./bella.exe [OPTIONS]\n\n");
+    printf("Default save directory: ./saves/ ./bellascandy/\n");
+    printf("Default save file: ./bellaslist.txt\n");
+    printf("Default bindings:\n"
            "    hotkey1     <control 1>    Download media from highlighted url.\n"
            "    hotkey2     <control 2>    Download media from url in clipboard.\n"
            "    hotkey3     <control 3>    Download all in ./bellaslist.txt\n"
            "    hotkey4     <control 4>    Store highlighted content to ./bellaslist.txt\n"
-           "    hotkey5     <control `>    Exit bella\n"
-           "    hotkey6     <control 0>    Exit bella\n"
+           "    hotkey5     <control 5>    Store clipboard content to ./bellaslist.txt\n"
+           "    hotkey6     <control `>    Exit bella\n"
+           "    hotkey7     <control 0>    Exit bella\n"
            );
 
-    pDEBUG("Options:\n"
+    printf("Options:\n"
            "    -h, --help              Prints this help text and exit.\n"
            );
 }
@@ -48,34 +50,12 @@ static void print_last_error(void)
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-
-# ifdef DEBUGPRINT
-    setbuf(stdout, NULL);
-    setbuf(stderr, NULL);
-# endif
-
-    opterr = 0;
-
-    const struct option long_options[] = {
-        {"help", no_argument, 0, 'h'}
-    };
-
-    int option, option_index = 0;
-    while ( (option = getopt_long(argc, argv, "h", 
-                                  long_options, &option_index)) != -1) 
+    if (argc > 1)
     {
-        switch (option)
-        {
-            case 'h':
-                usage();
-                exit( EXIT_SUCCESS );
-                break;
-
-            default:
-                abort();
-        }
+        usage();
+        exit(EXIT_SUCCESS);
     }
 
     pDEBUG("Checking if processor is available...");
@@ -118,23 +98,29 @@ int main(int argc, char *argv[])
                     break;
 
                 case (VK_HOTKEY3):
+                    download_bellaslist();
                     break;
 
                 case (VK_HOTKEY4):
+                    store_hl();
                     break;
 
                 case (VK_HOTKEY5):
-                    pDEBUG("\nGoodbye! Bella is leaving you.\n");
-                    exit( EXIT_SUCCESS );
+                    store_clipboard();
                     break;
 
                 case (VK_HOTKEY6):
+                    pDEBUG("\nGoodbye! Bella is leaving you.\n");
+                    exit(EXIT_SUCCESS);
+                    break;
+
+                case (VK_HOTKEY7):
                     pDEBUG("\nSayonora! Bella will see you on the other side.\n");
                     exit(EXIT_SUCCESS);
                     break;
 
                 default:
-                    pDEBUG("Something has gone horribly wrong\n");
+                    pDEBUG("Thanks a lot for breaking this program.\n");
                     abort();
             }
 
