@@ -91,6 +91,11 @@ static const key hotkeys[] = {
     [VK_HOTKEY7] = { .keys = { VK_CONTROL, VK_0 }},
 };
 
+static void error(const char *msg)
+{
+    MessageBox(NULL, msg, "error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);
+}
+
 int ishotkeydown(int hotkey[]);
 
 void download_hl(void);

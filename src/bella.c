@@ -12,7 +12,6 @@
 
 # define MAX_SZ 2048 
 
-static void error(const char *);
 static int  copy(void);
 static char *getclipboardS(void);
 static void download(const char *, const char *);
@@ -22,11 +21,6 @@ static const char savedir[] = "./saves";
 static const char savedir2[] = "./bellascandy";
 static const char savefile[] = "./bellaslist.txt";
 static const short mostsigbit = (1 << 15);
-
-static void error(const char *msg)
-{
-    MessageBox(NULL, msg, "error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);
-}
 
 /* Copy to clipboard only if it's different than the previous content*/
 static int copy(void)
@@ -48,7 +42,7 @@ static int copy(void)
         for (int i = 0; i < 5; ++i) nanosleep(&mssleep, NULL); // 500 ms
     } while (strcpy(curr, getclipboardS()), strcmp(prev, curr) == 0 && retry < maxretry);
 
-    if (retry >= maxretry) error("Unable to copy after max retry %d\n", maxretry);
+    if (retry >= maxretry) error("Unable to copy after max retry");
 
     return (retry < maxretry) ? true : false;
 }
@@ -211,7 +205,7 @@ int reghotkeys(void)
         if (!RegisterHotKey(NULL, id, MOD_CONTROL, hotkeys[id].keys[1]))
         {
             pERROR("Failed to register hotkey %d\n", id);
-            error("Failed to register hotkey %d", id);
+            error("Failed to register hotkey");
             errflag = 1;
         }
     }
