@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
     int *key;
     MSG msg = {0};
-    while (GetMessage(&msg, NULL, 0, 0) > 0)
+    while (GetMessage(&msg, NULL, WM_HOTKEY, WM_HOTKEY) > 0)
     {
         if (msg.message == WM_HOTKEY)
         {

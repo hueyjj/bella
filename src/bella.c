@@ -48,6 +48,8 @@ static int copy(void)
         for (int i = 0; i < 5; ++i) nanosleep(&mssleep, NULL); // 500 ms
     } while (strcpy(curr, getclipboardS()), strcmp(prev, curr) == 0 && retry < maxretry);
 
+    if (retry >= maxretry) error("Unable to copy after max retry %d\n", maxretry);
+
     return (retry < maxretry) ? true : false;
 }
 
@@ -58,6 +60,7 @@ static char *getclipboardS(void)
     if (!OpenClipboard(cbOwner)) 
     {
         pERROR("Failed to open clipboard\n");
+        error("Failed to open clipboard\n");
     }
         
     HANDLE clipboard;
@@ -66,6 +69,7 @@ static char *getclipboardS(void)
     if (!clipboard) 
     { 
         pERROR("Clipboard handle error\n"); 
+        error("Clipboard handle error\n"); 
         return (char *) 0;
     }
 
@@ -74,6 +78,7 @@ static char *getclipboardS(void)
     if (!text)
     {
         pERROR("Unable to read text from clipboard\n");
+        error("Unable to read text from clipboard\n");
         return (char *) 0;
     }
 
@@ -200,48 +205,15 @@ void store_clipboard(void)
 
 int reghotkeys(void)
 {
-    int exitflag = 0;
-
-    if (!RegisterHotKey(NULL, VK_HOTKEY1, MOD_CONTROL, hotkeys[VK_HOTKEY1].keys[1]))
+    int errflag = 0;
+    for (int id = VK_HOTKEY1; id < VK_HOTKEY8; ++id)
     {
-        pERROR("Failed to register hotkey 1\n");
-        exitflag = 1;
+        if (!RegisterHotKey(NULL, id, MOD_CONTROL, hotkeys[id].keys[1]))
+        {
+            pERROR("Failed to register hotkey %d\n", id);
+            error("Failed to register hotkey %d", id);
+            errflag = 1;
+        }
     }
-    
-    if (!RegisterHotKey(NULL, VK_HOTKEY2, MOD_CONTROL, hotkeys[VK_HOTKEY2].keys[1]))
-    {
-        pERROR("Failed to register hotkey 2\n");
-        exitflag = 1;
-    }
-
-    if (!RegisterHotKey(NULL, VK_HOTKEY3, MOD_CONTROL, hotkeys[VK_HOTKEY3].keys[1]))
-    {
-        pERROR("Failed to register hotkey 3\n");
-        exitflag = 1;
-    }
-
-    if (!RegisterHotKey(NULL, VK_HOTKEY4, MOD_CONTROL, hotkeys[VK_HOTKEY4].keys[1]))
-    {
-        pERROR("Failed to register hotkey 4\n");
-        exitflag = 1;
-    }
-
-    if (!RegisterHotKey(NULL, VK_HOTKEY5, MOD_CONTROL, hotkeys[VK_HOTKEY5].keys[1]))
-    {
-        pERROR("Failed to register hotkey 5\n");
-        exitflag = 1;
-    }
-
-    if (!RegisterHotKey(NULL, VK_HOTKEY6, MOD_CONTROL, hotkeys[VK_HOTKEY6].keys[1]))
-    {
-        pERROR("Failed to register hotkey 6\n");
-        exitflag = 1;
-    }
-
-    if (!RegisterHotKey(NULL, VK_HOTKEY7, MOD_CONTROL, hotkeys[VK_HOTKEY7].keys[1]))
-    {
-        pERROR("Failed to register hotkey 7\n");
-        exitflag = 1;
-    }
-    return exitflag;
+    return errflag;
 }
