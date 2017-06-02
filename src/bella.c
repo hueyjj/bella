@@ -200,7 +200,7 @@ void store_clipboard(void)
 int reghotkeys(void)
 {
     int errflag = 0;
-    for (int id = VK_HOTKEY1; id < VK_HOTKEY8; ++id)
+    for (int id = VK_HOTKEY1; id <= VK_HOTKEY8; ++id)
     {
         if (!RegisterHotKey(NULL, id, MOD_CONTROL, hotkeys[id].keys[1]))
         {

@@ -89,8 +89,10 @@ static const key hotkeys[] = {
     [VK_HOTKEY5] = { .keys = { VK_CONTROL, VK_5 }},
     [VK_HOTKEY6] = { .keys = { VK_CONTROL, VK_OEM_3 }},
     [VK_HOTKEY7] = { .keys = { VK_CONTROL, VK_0 }},
+    [VK_HOTKEY8] = { .keys = { VK_CONTROL, VK_9 }},
 };
 
+/* Pop up message box. Used for anything not just error, but default use is error */
 static void error(const char *msg)
 {
     MessageBox(NULL, msg, "error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);

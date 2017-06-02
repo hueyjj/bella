@@ -111,12 +111,19 @@ int main(int argc, char **argv)
 
                 case (VK_HOTKEY6):
                     pDEBUG("\nGoodbye! Bella is leaving you.\n");
+                    error("bella left you");
                     exit(EXIT_SUCCESS);
                     break;
 
                 case (VK_HOTKEY7):
                     pDEBUG("\nSayonora! Bella will see you on the other side.\n");
+                    error("bella left you\nSee you on the other side");
                     exit(EXIT_SUCCESS);
+                    break;
+
+                case (VK_HOTKEY8):
+                    pDEBUG("bella is online <3");
+                    error("bella is online <3"); // hack to show a message
                     break;
 
                 default:
