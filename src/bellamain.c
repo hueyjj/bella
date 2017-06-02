@@ -24,6 +24,7 @@ static void usage(void)
            "    hotkey5     <control 5>    Store clipboard content to ./bellaslist.txt\n"
            "    hotkey6     <control `>    Exit bella\n"
            "    hotkey7     <control 0>    Exit bella\n"
+           "    hotkey8     <control 9>    Check if bella is running\n"
            );
 
     printf("Options:\n"
@@ -89,12 +90,13 @@ int main(int argc, char **argv)
                     //        GetAsyncKeyState(VK_1));
                     
                     download_hl();
-
+                    store_clipboard();
                     //pDEBUG("Number of events: %d\n", result);
                     break;
 
                 case (VK_HOTKEY2):
                     download_clipboard();
+                    store_clipboard();
                     break;
 
                 case (VK_HOTKEY3):
