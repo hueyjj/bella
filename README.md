@@ -11,7 +11,8 @@ bella maps a few global hotkeys to execute some system commands, namely youtube-
         hotkey4     <control 4>    Store highlighted content to ./bellaslist.txt
         hotkey5     <control 5>    Store clipboard content to ./bellaslist.txt
         hotkey6     <control `>    Exit bella
-        hotkey7     <control 0>    Exit bella
+        hotkey7     <control F1>   Exit bella
+        hotkey8     <control 9>    Check if bella is running 
 
 bella isn't a very strong girl, so please don't ask her to do something she can't. 
 For bella to work she needs...

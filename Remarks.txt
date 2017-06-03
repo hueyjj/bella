@@ -4,3 +4,9 @@ Known issues:
     and then alt modifier allows the copy-to-clipboard operation to work. But when the alt modifier is released first and then 
     somekey, the copy-to-clipboard operation fails. I actually have no clue why it fails. Google searches escape me.
     Somethings things I have tried but not limited to: GetKeyState(), GetAsyncKeyState(), GetKeyboardState(), SetKeyboardState().
+
+- Unable to use bella after a sytem restart or initial start up of main system
+    For some reason, bella is unable to get the clip board handle after a system restart.
+    I am unsure why, but after using the clipboard once (control + c any text).
+    Bella works as normal. So I am guessing the system needs to register the clipboard handle
+    to the system (???).

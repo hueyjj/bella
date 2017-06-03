@@ -88,7 +88,7 @@ static const key hotkeys[] = {
     [VK_HOTKEY4] = { .keys = { VK_CONTROL, VK_4 }},
     [VK_HOTKEY5] = { .keys = { VK_CONTROL, VK_5 }},
     [VK_HOTKEY6] = { .keys = { VK_CONTROL, VK_OEM_3 }},
-    [VK_HOTKEY7] = { .keys = { VK_CONTROL, VK_0 }},
+    [VK_HOTKEY7] = { .keys = { VK_CONTROL, VK_F1 }},
     [VK_HOTKEY8] = { .keys = { VK_CONTROL, VK_9 }},
 };
 

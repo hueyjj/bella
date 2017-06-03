@@ -23,7 +23,7 @@ static void usage(void)
            "    hotkey4     <control 4>    Store highlighted content to ./bellaslist.txt\n"
            "    hotkey5     <control 5>    Store clipboard content to ./bellaslist.txt\n"
            "    hotkey6     <control `>    Exit bella\n"
-           "    hotkey7     <control 0>    Exit bella\n"
+           "    hotkey7     <control F1>   Exit bella\n"
            "    hotkey8     <control 9>    Check if bella is running\n"
            );
 
