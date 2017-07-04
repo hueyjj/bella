@@ -1,0 +1,2 @@
+add tool tip pop up download verification
+rebind keys to read a config file, else bind to default keys (hard coded)
