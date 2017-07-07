@@ -9,7 +9,6 @@
 # include "bella.h"
 
 static void usage(void);
-static void print_last_error(void);
 
 static void usage(void)
 {
@@ -32,25 +31,6 @@ static void usage(void)
            );
 }
 
-static void print_last_error(void)
-{
-    DWORD errorMessageID = GetLastError();
-    if (errorMessageID != 0)
-    {
-        LPSTR messageBuffer = NULL;
-        size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                                     FORMAT_MESSAGE_FROM_SYSTEM |
-                                     FORMAT_MESSAGE_IGNORE_INSERTS,
-                                     NULL, errorMessageID,
-                                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-                                     (LPSTR)&messageBuffer, 0, NULL);
-        
-        pDEBUG("Last error: %s\n", messageBuffer);
-
-        LocalFree(messageBuffer);
-    }
-}
-
 int main(int argc, char **argv)
 {
     if (argc > 1)
@@ -68,7 +48,11 @@ int main(int argc, char **argv)
     }
 
     // Register hot keys
-    reghotkeys();
+    if (!reghotkeys()) 
+    {
+        error("unable to register a couple primary keys");
+        exit(EXIT_SUCCESS);
+    }
 
     int *key;
     MSG msg = {0};

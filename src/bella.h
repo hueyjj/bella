@@ -98,6 +98,28 @@ static void error(const char *msg)
     MessageBox(NULL, msg, "error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);
 }
 
+static void print_last_error(char *helpermsg)
+{
+    DWORD errorMessageID = GetLastError();
+    if (errorMessageID != 0)
+    {
+        LPSTR message = NULL;
+        size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                                     FORMAT_MESSAGE_FROM_SYSTEM |
+                                     FORMAT_MESSAGE_IGNORE_INSERTS,
+                                     NULL, errorMessageID,
+                                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                                     (LPSTR)&message, 0, NULL);
+        
+        //pDEBUG("Last error: %s\n", message);
+        char buffer[2056];
+        sprintf(buffer, "%s %s", helpermsg, message);
+        error(buffer);
+
+        LocalFree(message);
+    }
+}
+
 int ishotkeydown(int hotkey[]);
 
 void download_hl(void);

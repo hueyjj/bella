@@ -199,14 +199,20 @@ void store_clipboard(void)
 
 int reghotkeys(void)
 {
-    int errflag = 0;
+    int errflag = 1; // false
     for (int id = VK_HOTKEY1; id <= VK_HOTKEY8; ++id)
     {
         if (!RegisterHotKey(NULL, id, MOD_CONTROL, hotkeys[id].keys[1]))
         {
-            pERROR("Failed to register hotkey %d\n", id);
-            error("Failed to register hotkey");
-            errflag = 1;
+            char helpermsg[2056];
+            sprintf(helpermsg, "[hotkey %d (decimal) check msdn virtual key code]", 
+                    hotkeys[id].keys[1]);
+            print_last_error(helpermsg);
+            //pERROR("Failed to register hotkey %d\n", id);
+            //error("Failed to register hotkey");
+            //
+            if (id == VK_HOTKEY1 || id == VK_HOTKEY7) 
+                errflag = 0; // handle error if could not register a primary key
         }
     }
     return errflag;
