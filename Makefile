@@ -1,5 +1,5 @@
 CC		= gcc
-DEBUG	= -DDEBUGPRINT -Wall
+DEBUG	= -DDEBUGPRINT #-Wall
 STATIC	= -static -static-libgcc -static-libstdc++
 FLAGS 	= --std=c99 -mwindows -O2 
 

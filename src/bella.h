@@ -17,16 +17,16 @@
 
 # define VK_COPY        0x00
 
-# define VK_HOTKEY1     0x01
-# define VK_HOTKEY2     0x02
-# define VK_HOTKEY3     0x03
-# define VK_HOTKEY4     0x04
-# define VK_HOTKEY5     0x05
-# define VK_HOTKEY6     0x06
-# define VK_HOTKEY7     0x07
-# define VK_HOTKEY8     0x08
-# define VK_HOTKEY9     0x09
-# define VK_HOTKEY10    0x0A
+# define VK_HOTKEY1     0x21
+# define VK_HOTKEY2     0x22
+# define VK_HOTKEY3     0x23
+# define VK_HOTKEY4     0x24
+# define VK_HOTKEY5     0x25
+# define VK_HOTKEY6     0x26
+# define VK_HOTKEY7     0x27
+# define VK_HOTKEY8     0x28
+# define VK_HOTKEY9     0x29
+# define VK_HOTKEY10    0x2A
 
 # define VK_0   0x30
 # define VK_1   0x31
@@ -66,6 +66,14 @@
 # define VK_Y   0x59
 # define VK_Z   0x5A
 
+#define SYSTEM_TRAY_ICON_ID     2800 
+#define WM_TRAYICON             WM_USER + 1
+
+HWND hwnd;
+HMENU systemTrayMenu;
+HINSTANCE hInst;
+NOTIFYICONDATA systemTrayIcon;
+
 static const struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
 
 // Input to send (Ctrl+c copy key)
@@ -98,7 +106,7 @@ static void error(const char *msg)
     MessageBox(NULL, msg, "error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);
 }
 
-static void print_last_error(char *helpermsg)
+static void printLastError(char *helpermsg)
 {
     DWORD errorMessageID = GetLastError();
     if (errorMessageID != 0)
@@ -120,14 +128,27 @@ static void print_last_error(char *helpermsg)
     }
 }
 
-int ishotkeydown(int hotkey[]);
+static void balloonTip(char *msg)
+{
+    NOTIFYICONDATA nid = {0};
+    nid.cbSize = sizeof(NOTIFYICONDATA);
+    nid.hWnd = hwnd;
+    nid.uID = SYSTEM_TRAY_ICON_ID;
+    nid.uFlags = NIF_INFO;
+    nid.uCallbackMessage = WM_TRAYICON;
+    //nid.hIcon = (HICON) LoadImage(NULL, TEXT("Happy-face.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+    strcpy(nid.szInfo, TEXT(msg));
+    Shell_NotifyIcon(NIM_MODIFY, &nid);
+}
 
-void download_hl(void);
-void download_clipboard(void);
-void download_bellaslist(void);
-void store_hl(void);
-void store_clipboard(void);
+int isHotkeyDown(int hotkey[]);
 
-int reghotkeys(void);
+void downloadhl(void);
+void downloadClipboard(void);
+void downloadBellaslist(void);
+void storeHl(void);
+void storeClipboard(void);
+
+int registerHotkeys(HWND hwnd);
 
 # endif

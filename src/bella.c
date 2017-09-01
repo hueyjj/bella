@@ -1,19 +1,19 @@
-# define _GNU_SOURCE 
+#define _GNU_SOURCE 
 
-# include <stdlib.h>
-# include <stdio.h>
-# include <stdbool.h>
-# include <string.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-# include "bella.h"
+#include "bella.h"
 
-# define MAX_SZ 2048 
+#define MAX_SZ 2048 
 
 static int  copy(void);
-static char *getclipboardS(void);
+static char *getClipboardString(void);
 static void download(const char *, const char *);
 static void store(const char *);
 
@@ -21,6 +21,9 @@ static const char savedir[] = "./saves";
 static const char savedir2[] = "./bellascandy";
 static const char savefile[] = "./bellaslist.txt";
 static const short mostsigbit = (1 << 15);
+
+static const char *youtube = "youtube-dl";
+static const char *param = "-o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
 
 /* Copy to clipboard only if it's different than the previous content*/
 static int copy(void)
@@ -30,8 +33,8 @@ static int copy(void)
     int retry = 0;
     char prev[MAX_SZ], curr[MAX_SZ];
 
-    //prev = getclipboardS();
-    strcpy(prev, getclipboardS());
+    //prev = getClipboardString();
+    strcpy(prev, getClipboardString());
 
     do 
     {
@@ -40,7 +43,7 @@ static int copy(void)
         retry++;
         result = SendInput(4, (LPINPUT) copykey, sizeof(INPUT));
         for (int i = 0; i < 5; ++i) nanosleep(&mssleep, NULL); // 500 ms
-    } while (strcpy(curr, getclipboardS()), strcmp(prev, curr) == 0 && retry < maxretry);
+    } while (strcpy(curr, getClipboardString()), strcmp(prev, curr) == 0 && retry < maxretry);
 
     if (retry >= maxretry) error("Unable to copy after max retry");
 
@@ -48,7 +51,7 @@ static int copy(void)
 }
 
 /* Retrieves text from clipboard */
-static char *getclipboardS(void)
+static char *getClipboardString(void)
 {
     HWND cbOwner = GetClipboardOwner();
     if (!OpenClipboard(cbOwner)) 
@@ -88,20 +91,12 @@ static void download(const char *dir, const char *url)
     if (stat(dir, &sb) != 0 || !S_ISDIR(sb.st_mode))
         mkdir(dir);
 
-    //char *cmd;
-    const char *youtube = "youtube-dl";
-    const char *param = "-o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
-    char *paramb;
+    char *cmd;
 
-    asprintf(&paramb, "%s %s", param, url);
-
-    //const char *youtubedl = "youtube-dl -o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
-    //asprintf(&cmd, "(cd %s && %s %s)", dir, youtubedl, url);
-    //pDEBUG("\nExecuting...\n%s\n\n", cmd); 
-
+    asprintf(&cmd, "%s %s", param, url);
 
     pDEBUG("\nExecuting..\n\n");
-    int sh = ShellExecute(NULL, "open", youtube, paramb, dir, SW_HIDE);
+    int sh = ShellExecute(NULL, "open", youtube, cmd, dir, SW_HIDE);
     if (sh <= 32)
     {
         error("download: Unable to execute youtube-dl"); 
@@ -130,7 +125,7 @@ static void store(const char *buf)
 
 /*------------------------------------------------------------------------------------*/
 
-int ishotkeydown(int hotkey[])
+int isHotkeyDown(int hotkey[])
 {
     int flag = 0;
     for (int i = 0; i < size(hotkey); ++i)
@@ -141,31 +136,31 @@ int ishotkeydown(int hotkey[])
     return (flag == 1) ? true : false;
 }
 
-void download_hl(void)
+void downloadhl(void)
 {
     copy();
 
     // TODO add a way to verify if downloaded and if it's the right file
 
-    char *url = getclipboardS();
+    char *url = getClipboardString();
     pDEBUG("In clipboard: %s\n", url);
     download(savedir, url);
 }
 
-void download_clipboard(void)
+void downloadClipboard(void)
 {
-    char *url = getclipboardS();
+    char *url = getClipboardString();
     download(savedir, url);
 }
 
-void download_bellaslist(void)
+void downloadBellaslist(void)
 {
     FILE *infile;
 
     if ( (infile = fopen(savefile, "r")) == (FILE *) 0)
     {
-        pERROR("download_bellaslist: Unable to open bellaslist\n");
-        error("download_bellaslist: Unable to open bellaslist");
+        pERROR("downloadBellaslist: Unable to open bellaslist\n");
+        error("downloadBellaslist: Unable to open bellaslist");
         fclose(infile);
         return;
     }
@@ -182,32 +177,32 @@ void download_bellaslist(void)
     fclose(infile);
 }
 
-void store_hl(void)
+void storeHl(void)
 {
     copy();
 
     char buffer[MAX_SZ];
-    strcpy(buffer, getclipboardS());
+    strcpy(buffer, getClipboardString());
 
     store(buffer);
 }
 
-void store_clipboard(void)
+void storeClipboard(void)
 {
-    store(getclipboardS()); 
+    store(getClipboardString()); 
 }
 
-int reghotkeys(void)
+int registerHotkeys(HWND hwnd)
 {
     int errflag = 1; // false
     for (int id = VK_HOTKEY1; id <= VK_HOTKEY8; ++id)
     {
-        if (!RegisterHotKey(NULL, id, MOD_CONTROL, hotkeys[id].keys[1]))
+        if (!RegisterHotKey(hwnd, id, MOD_CONTROL, hotkeys[id].keys[1]))
         {
             char helpermsg[2056];
             sprintf(helpermsg, "[hotkey %d (decimal) check msdn virtual key code]", 
                     hotkeys[id].keys[1]);
-            print_last_error(helpermsg);
+            printLastError(helpermsg);
             //pERROR("Failed to register hotkey %d\n", id);
             //error("Failed to register hotkey");
             //
