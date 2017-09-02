@@ -25,36 +25,46 @@ static const short mostsigbit = (1 << 15);
 static const char *youtube = "C:\\ffmpeg\\bin\\youtube-dl"; //TODO Find youtube-dl path using win api
 static const char *param = "-o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
 
-/* Copy to clipboard only if it's different than the previous content */
+/* Copy to clipboard */
 static int copy(void)
 {
-    UINT result;
-    const int maxretry = 5;
+    //char prev[MAX_SZ], curr[MAX_SZ];
+
+    //char *clipboardString = getClipboardString();
+    //if (clipboardString)
+    //    strcpy(prev, getClipboardString());
+    //else
+    //    strcpy(prev, "SAME STRING");
+
+    const int maxRetry = 5;
     int retry = 0;
-    char prev[MAX_SZ], curr[MAX_SZ];
-
-    //prev = getClipboardString();
-    strcpy(prev, getClipboardString());
-
+    UINT result;
     do 
     {
         //pDEBUG("prev: %s\n", prev);
         //pDEBUG("curr: %s\n", curr);
         retry++;
-        result = SendInput(4, (LPINPUT) copykey, sizeof(INPUT));
-        for (int i = 0; i < 5; ++i) nanosleep(&mssleep, NULL); // 500 ms
-    } while (strcpy(curr, getClipboardString()), strcmp(prev, curr) == 0 && retry < maxretry);
+        result = SendInput(4, (LPINPUT) copykey, sizeof(INPUT));    // Send control + c 
+        for (int i = 0; i < 5; ++i)
+            nanosleep(&mssleep, NULL); // 500 ms
+        
+        //char *clipboardString = getClipboardString();
+        //if (clipboardString)
+        //    strcpy(curr, clipboardString); 
+        //else
+        //    strcpy(curr, "SAME STRING");
+    } while (getClipboardString() == NULL && retry < maxRetry);
+    //} while (strcmp(prev, curr) == 0 && retry < maxretry);
 
-    if (retry >= maxretry) error("Unable to copy after max retry");
+    if (retry >= maxRetry) balloonTip("Unable to copy after max retry");
 
-    return (retry < maxretry) ? true : false;
+    return (retry < maxRetry) ? true : false;
 }
 
 /* Retrieves text from clipboard */
 static char *getClipboardString(void)
 {
-    HWND cbOwner = GetClipboardOwner();
-    if (!OpenClipboard(cbOwner)) 
+    if (!OpenClipboard(hwnd)) 
     {
         pERROR("Failed to open clipboard\n");
         error("Failed to open clipboard\n");
@@ -64,10 +74,22 @@ static char *getClipboardString(void)
     clipboard = GetClipboardData(CF_TEXT);
 
     if (!clipboard) 
-    { 
+    {  
+        DWORD errorMessageID = GetLastError();
+        LPSTR message = NULL;
+        FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                       FORMAT_MESSAGE_FROM_SYSTEM |
+                       FORMAT_MESSAGE_IGNORE_INSERTS,
+                       NULL, errorMessageID,
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                       (LPSTR)&message, 0, NULL);
+        
+        printf("%s\n", message); fflush(stdout);
+
         pERROR("Clipboard handle error\n"); 
-        error("Clipboard handle error\n"); 
-        return (char *) 0;
+        //error("Clipboard handle error\n"); 
+        balloonTip("Clipboard is NULL: Handle error\n");
+        return NULL;
     }
 
     LPSTR text;
@@ -75,14 +97,19 @@ static char *getClipboardString(void)
     if (!text)
     {
         pERROR("Unable to read text from clipboard\n");
-        error("Unable to read text from clipboard\n");
-        return (char *) 0;
+        //error("Unable to read text from clipboard\n");
+        balloonTip("Text from clipboard is NULL\n");
+        return NULL;
     }
 
+    char *cp = calloc(MAX_SZ, sizeof(*cp));
+    strcpy(cp, text);
+    
     GlobalUnlock(clipboard);
     CloseClipboard();
+    EmptyClipboard();
 
-    return text;
+    return cp;
 }
 
 static void download(const char *dir, const char *url)
@@ -163,19 +190,24 @@ int isHotkeyDown(int hotkey[])
 
 void downloadhl(void)
 {
-    copy();
-
-    // TODO add a way to verify if downloaded and if it's the right file
+    if (!copy())
+        return;
 
     char *url = getClipboardString();
-    pDEBUG("In clipboard: %s\n", url);
-    download(savedir, url);
+    if (url)
+    {
+        pDEBUG("In clipboard: %s\n", url);
+        download(savedir, url);
+    }
 }
 
 void downloadClipboard(void)
 {
     char *url = getClipboardString();
-    download(savedir, url);
+    if (url)
+    {
+        download(savedir, url);
+    }
 }
 
 void downloadBellaslist(void)
@@ -207,9 +239,12 @@ void storeHl(void)
     copy();
 
     char buffer[MAX_SZ];
-    strcpy(buffer, getClipboardString());
-
-    store(buffer);
+    char *clipboardString = getClipboardString();
+    if (clipboardString)
+    {
+        strcpy(buffer, getClipboardString());
+        store(buffer);
+    }
 }
 
 void storeClipboard(void)

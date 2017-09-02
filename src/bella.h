@@ -107,23 +107,20 @@ static void error(const char *msg)
 static void printLastError()
 {
     DWORD errorMessageID = GetLastError();
-    if (errorMessageID != 0)
-    {
-        LPSTR message = NULL;
-        size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                                     FORMAT_MESSAGE_FROM_SYSTEM |
-                                     FORMAT_MESSAGE_IGNORE_INSERTS,
-                                     NULL, errorMessageID,
-                                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-                                     (LPSTR)&message, 0, NULL);
-        
-        //pDEBUG("Last error: %s\n", message);
-        //char buffer[2056];
-        //sprintf(buffer, "%s %s", helpermsg, message);
-        error(message);
+    LPSTR message = NULL;
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                                 FORMAT_MESSAGE_FROM_SYSTEM |
+                                 FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID,
+                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                                 (LPSTR)&message, 0, NULL);
+    
+    //pDEBUG("Last error: %s\n", message);
+    //char buffer[2056];
+    //sprintf(buffer, "%s %s", helpermsg, message);
+    error(message);
 
-        LocalFree(message);
-    }
+    LocalFree(message);
 }
 
 static void balloonTip(char *msg)

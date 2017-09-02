@@ -30,7 +30,6 @@ static NOTIFYICONDATA initSystemTray()
     //nid.hIcon = (HICON) LoadImage(NULL, TEXT("Happy-face.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
     nid.hIcon = (HICON) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON_BELLA), 
                                   IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-    printLastError();
     strcpy(nid.szTip, TEXT("bella's program"));
     return nid;
 }
@@ -90,7 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     // Register hot keys
     if (!registerHotkeys(windowHwnd)) 
     {
-        error("Unable t register a couple primary keys");
+        error("Unable to register a couple primary keys");
         exit(EXIT_SUCCESS);
     }
  
@@ -159,13 +158,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case (VK_HOTKEY6):
                     pDEBUG("\nGoodbye! Bella is leaving you.\n");
-                    error("bella left you");
+                    //error("bella left you");
                     PostQuitMessage(0);
                     break;
 
                 case (VK_HOTKEY7):
                     pDEBUG("\nSayonora! Bella will see you on the other side.\n");
-                    error("bella left you\nSee you on the other side");
+                    //error("bella left you\nSee you on the other side");
                     PostQuitMessage(0);
                     break;
 
