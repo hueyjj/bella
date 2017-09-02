@@ -20,8 +20,11 @@ For bella to work she needs...
 1. win32 api (Windows)
 2. youtube-dl (runnable through shell, and path to C:\ffmpeg\bin\youtube-dl, 
 or change it directly in the source file, bella.c)
+
     static const char *youtube = C:\\ffmpeg\\bin\\youtube-dl
+
 to
+
     static const char *youtube = C:\\path\\to\\youtube-dl
 
 ## Compiling
@@ -35,7 +38,7 @@ stuff into a command line / shell. Bella basically does two things. Get stuff fr
 (where control + c content lives) and whatever is highlighted. Then it just passes that information to 
 youtube-dl and let it do the hard work.
 
-Usually this how it would used:
+Usually this how it would be used:
 1. Run bella.exe and hope that no dialog pop up (errors)
 2. Control + 9 to check if a balloon tip comes up
 3. Highlight link in the browser
