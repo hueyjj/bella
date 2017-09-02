@@ -21,8 +21,8 @@ For bella to work she needs...
 2. youtube-dl (runnable through shell, and path to C:\ffmpeg\bin\youtube-dl, 
 or change it directly in the source file, bella.c)
 
-
-
+from
+    
     static const char *youtube = C:\\ffmpeg\\bin\\youtube-dl
 
 to
