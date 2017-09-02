@@ -11,33 +11,14 @@
 static TCHAR szWindowClass[] = TEXT("Bella application");  
 static TCHAR szTitle[] = TEXT("Bella");  
 
+static HINSTANCE hInst;
+static NOTIFYICONDATA systemTrayIcon;
+static HMENU systemTrayMenu;
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);  
-NOTIFYICONDATA initSystemTray();
+static NOTIFYICONDATA initSystemTray();
 
-//static void usage(void);
-//
-//static void usage(void)
-//{
-//    printf("Usage: ./bella.exe [OPTIONS]\n\n");
-//    printf("Default save directory: ./saves/ ./bellascandy/\n");
-//    printf("Default save file: ./bellaslist.txt\n");
-//    printf("Default bindings:\n"
-//           "    hotkey1     <control 1>    Download media from highlighted url.\n"
-//           "    hotkey2     <control 2>    Download media from url in clipboard.\n"
-//           "    hotkey3     <control 3>    Download all in ./bellaslist.txt\n"
-//           "    hotkey4     <control 4>    Store highlighted content to ./bellaslist.txt\n"
-//           "    hotkey5     <control 5>    Store clipboard content to ./bellaslist.txt\n"
-//           "    hotkey6     <control `>    Exit bella\n"
-//           "    hotkey7     <control F1>   Exit bella\n"
-//           "    hotkey8     <control 9>    Check if bella is running\n"
-//           );
-//
-//    printf("Options:\n"
-//           "    -h, --help              Prints this help text and exit.\n"
-//           );
-//}
-
-NOTIFYICONDATA initSystemTray()
+static NOTIFYICONDATA initSystemTray()
 {
     NOTIFYICONDATA nid = {0};
     nid.cbSize = sizeof(NOTIFYICONDATA);
@@ -80,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     if (!RegisterClassEx(&wcex))  
     {  
-        printLastError(NULL);
+        printLastError();
         exit(EXIT_FAILURE);
     } 
    
@@ -97,7 +78,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                              NULL);
     if (!windowHwnd)  
     {  
-        printLastError(NULL);
+        printLastError();
         error("Unable to register window with the system");
         exit(EXIT_FAILURE);
     } 
@@ -118,14 +99,18 @@ int WINAPI WinMain(HINSTANCE hInstance,
     UpdateWindow(hwnd);
     
     MSG msg = {0};
-    while (GetMessage(&msg, NULL, WM_HOTKEY, WM_HOTKEY) > 0)
+    while (GetMessage(&msg, hwnd, 0, 0) > 0)
     {
+            // remove duplicate hotkey inputs
+            while (PeekMessage(&msg, hwnd, WM_HOTKEY, WM_HOTKEY, PM_REMOVE)); 
+            
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-            // remove duplicate hotkey inputs
-            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)); 
     }
 
+    // Remove system tray icon on exit
+    Shell_NotifyIcon(NIM_DELETE, &systemTrayIcon);
+    
     exit(EXIT_SUCCESS);
 }
 
@@ -135,11 +120,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         case WM_CREATE:
             systemTrayMenu = CreatePopupMenu();
-            AppendMenu(systemTrayMenu, MF_STRING, SYSTEM_TRAY_ICON_ID, TEXT("EXIT"));
+            AppendMenu(systemTrayMenu, MF_STRING, SYSTEM_TRAY_MENU_EXIT, TEXT("EXIT"));
             break;
-        case WM_DESTROY:
-            Shell_NotifyIcon(NIM_DELETE, &systemTrayIcon);
-            break;
+        
         case WM_HOTKEY:
             { 
             int *key = (int *) hotkeys[wParam].keys; 
@@ -149,16 +132,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wParam)
             {
                 case (VK_HOTKEY1):
-                    //pDEBUG("LAlt: %d RAlt: %d Alt: %d Ctrl: %d one: %d\n",
-                    //        GetAsyncKeyState(VK_LMENU),
-                    //        GetAsyncKeyState(VK_RMENU),
-                    //        GetAsyncKeyState(VK_MENU),
-                    //        GetAsyncKeyState(VK_LCONTROL),
-                    //        GetAsyncKeyState(VK_1));
-                    
                     downloadhl();
                     storeClipboard();
-                    //pDEBUG("Number of events: %d\n", result);
                     break;
 
                 case (VK_HOTKEY2):
@@ -181,25 +156,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case (VK_HOTKEY6):
                     pDEBUG("\nGoodbye! Bella is leaving you.\n");
                     error("bella left you");
-                    exit(EXIT_SUCCESS);
+                    PostQuitMessage(0);
                     break;
 
                 case (VK_HOTKEY7):
                     pDEBUG("\nSayonora! Bella will see you on the other side.\n");
                     error("bella left you\nSee you on the other side");
-                    exit(EXIT_SUCCESS);
+                    PostQuitMessage(0);
                     break;
 
                 case (VK_HOTKEY8):
                     pDEBUG("bella is online <3");
-                    error("bella is online <3"); // hack to show a message
+                    balloonTip("bella is online <3");
                     break;
-                
-                case WM_DESTROY:  
-                     PostQuitMessage(0);  
-                     break;  
             }
             break;
+        
         case WM_TRAYICON:
             switch (wParam)
             {
@@ -207,9 +179,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     switch (lParam)
                     {
                         case WM_RBUTTONUP:
+                        {
+                            POINT cursorPos;
+                            GetCursorPos(&cursorPos);
+                            UINT id = TrackPopupMenu(systemTrayMenu, TPM_RETURNCMD | TPM_NONOTIFY,
+                                                          cursorPos.x, cursorPos.y, 0, hWnd, NULL);
+                            if (id == SYSTEM_TRAY_MENU_EXIT)
                             {
-                                balloonTip("Right click up");
+                                PostQuitMessage(0);
                             }
+                        }
                     }
                 break;
             }

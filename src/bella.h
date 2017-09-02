@@ -67,12 +67,10 @@
 # define VK_Z   0x5A
 
 #define SYSTEM_TRAY_ICON_ID     2800 
+#define SYSTEM_TRAY_MENU_EXIT   2801
 #define WM_TRAYICON             WM_USER + 1
 
-HWND hwnd;
-HMENU systemTrayMenu;
-HINSTANCE hInst;
-NOTIFYICONDATA systemTrayIcon;
+HWND hwnd; // Cannot be static for some reason when creating a balloon tip
 
 static const struct timespec mssleep = { .tv_sec = 0, .tv_nsec = 100000000 }; // 100 ms
 
@@ -106,7 +104,7 @@ static void error(const char *msg)
     MessageBox(NULL, msg, "error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);
 }
 
-static void printLastError(char *helpermsg)
+static void printLastError()
 {
     DWORD errorMessageID = GetLastError();
     if (errorMessageID != 0)
@@ -120,9 +118,9 @@ static void printLastError(char *helpermsg)
                                      (LPSTR)&message, 0, NULL);
         
         //pDEBUG("Last error: %s\n", message);
-        char buffer[2056];
-        sprintf(buffer, "%s %s", helpermsg, message);
-        error(buffer);
+        //char buffer[2056];
+        //sprintf(buffer, "%s %s", helpermsg, message);
+        error(message);
 
         LocalFree(message);
     }
@@ -136,7 +134,6 @@ static void balloonTip(char *msg)
     nid.uID = SYSTEM_TRAY_ICON_ID;
     nid.uFlags = NIF_INFO;
     nid.uCallbackMessage = WM_TRAYICON;
-    //nid.hIcon = (HICON) LoadImage(NULL, TEXT("Happy-face.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
     strcpy(nid.szInfo, TEXT(msg));
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }

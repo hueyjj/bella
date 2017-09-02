@@ -17,15 +17,15 @@ static char *getClipboardString(void);
 static void download(const char *, const char *);
 static void store(const char *);
 
-static const char savedir[] = "./saves";
-static const char savedir2[] = "./bellascandy";
+static const char savedir[] = "./current_saves";
+static const char savedir2[] = "./bellaslist_all";
 static const char savefile[] = "./bellaslist.txt";
 static const short mostsigbit = (1 << 15);
 
-static const char *youtube = "youtube-dl";
+static const char *youtube = "C:\\ffmpeg\\bin\\youtube-dl"; //TODO Find youtube-dl path using win api
 static const char *param = "-o \"%(title)s.%(ext)s\" -i --format m4a --embed-thumbnail --add-metadata";
 
-/* Copy to clipboard only if it's different than the previous content*/
+/* Copy to clipboard only if it's different than the previous content */
 static int copy(void)
 {
     UINT result;
@@ -93,15 +93,40 @@ static void download(const char *dir, const char *url)
 
     char *cmd;
 
-    asprintf(&cmd, "%s %s", param, url);
+    //asprintf(&cmd, "%s %s %s", youtube, param, url);
+    asprintf(&cmd, "%s %s %s", youtube, param, url);
 
-    pDEBUG("\nExecuting..\n\n");
-    int sh = ShellExecute(NULL, "open", youtube, cmd, dir, SW_HIDE);
-    if (sh <= 32)
+    pDEBUG("\nExecuting...\n\n");
+    
+    STARTUPINFO info;
+    PROCESS_INFORMATION processInfo;
+    
+    ZeroMemory(&info, sizeof(info));
+    info.cb = sizeof(info);
+    
+    ZeroMemory(&processInfo, sizeof(processInfo));
+    
+    if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, 
+                      NULL, dir, &info, &processInfo))
     {
-        error("download: Unable to execute youtube-dl"); 
-        return;
+        char *msg;
+        asprintf(&msg, "Downloading %s", url);
+        balloonTip(msg);
+        
+        int signalState = WaitForSingleObject(processInfo.hProcess, INFINITE);
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
+
+        asprintf(&msg, "Download complete for %s", url);
+        if (signalState == 0)
+            balloonTip(msg);
     }
+    //int sh = ShellExecute(NULL, "open", youtube, cmd, dir, SW_HIDE);
+    //if (sh <= 32)
+    //{
+    //    error("download: Unable to execute youtube-dl"); 
+    //    return;
+    //}
     //pDEBUG("shell execute code: %d ( > 32 == success)\n", sh);
 }
 
