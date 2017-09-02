@@ -1,70 +1,70 @@
-# ifndef __BELLA_H
-# define __BELLA_H
+#ifndef __BELLA_H
+#define __BELLA_H
 
-# include <Windows.h>
-# include <Shellapi.h>
-# include <time.h>
+#include <Windows.h>
+#include <Shellapi.h>
+#include <time.h>
 
-# ifdef DEBUGPRINT
-# define pDEBUG(...) printf(__VA_ARGS__)
-# define pERROR(...) fprintf(stderr, __VA_ARGS__)
-# else
-# define pDEBUG(...) 
-# define pERROR(...)
-# endif
+#ifdef DEBUGPRINT
+#define pDEBUG(...) printf(__VA_ARGS__)
+#define pERROR(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define pDEBUG(...) 
+#define pERROR(...)
+#endif
 
-# define size(arr)  (sizeof(arr) / sizeof(arr[0])) 
+#define size(arr)  (sizeof(arr) / sizeof(arr[0])) 
 
-# define VK_COPY        0x00
+#define VK_COPY        0x00
 
-# define VK_HOTKEY1     0x21
-# define VK_HOTKEY2     0x22
-# define VK_HOTKEY3     0x23
-# define VK_HOTKEY4     0x24
-# define VK_HOTKEY5     0x25
-# define VK_HOTKEY6     0x26
-# define VK_HOTKEY7     0x27
-# define VK_HOTKEY8     0x28
-# define VK_HOTKEY9     0x29
-# define VK_HOTKEY10    0x2A
+#define VK_HOTKEY1     0x21
+#define VK_HOTKEY2     0x22
+#define VK_HOTKEY3     0x23
+#define VK_HOTKEY4     0x24
+#define VK_HOTKEY5     0x25
+#define VK_HOTKEY6     0x26
+#define VK_HOTKEY7     0x27
+#define VK_HOTKEY8     0x28
+#define VK_HOTKEY9     0x29
+#define VK_HOTKEY10    0x2A
 
-# define VK_0   0x30
-# define VK_1   0x31
-# define VK_2   0x32
-# define VK_3   0x33
-# define VK_4   0x34
-# define VK_5   0x35
-# define VK_6   0x36
-# define VK_7   0x37
-# define VK_8   0x38
-# define VK_9   0x39
+#define VK_0   0x30
+#define VK_1   0x31
+#define VK_2   0x32
+#define VK_3   0x33
+#define VK_4   0x34
+#define VK_5   0x35
+#define VK_6   0x36
+#define VK_7   0x37
+#define VK_8   0x38
+#define VK_9   0x39
 
-# define VK_A   0x41
-# define VK_B   0x42
-# define VK_C   0x43
-# define VK_D   0x44
-# define VK_E   0x45
-# define VK_F   0x46
-# define VK_G   0x47
-# define VK_H   0x48
-# define VK_I   0x49
-# define VK_J   0x4A
-# define VK_K   0x4B
-# define VK_L   0x4C
-# define VK_M   0x4D
-# define VK_N   0x4E
-# define VK_O   0x4F
-# define VK_P   0x50
-# define VK_Q   0x51
-# define VK_R   0x52
-# define VK_S   0x53
-# define VK_T   0x54
-# define VK_U   0x55
-# define VK_V   0x56
-# define VK_W   0x57
-# define VK_X   0x58
-# define VK_Y   0x59
-# define VK_Z   0x5A
+#define VK_A   0x41
+#define VK_B   0x42
+#define VK_C   0x43
+#define VK_D   0x44
+#define VK_E   0x45
+#define VK_F   0x46
+#define VK_G   0x47
+#define VK_H   0x48
+#define VK_I   0x49
+#define VK_J   0x4A
+#define VK_K   0x4B
+#define VK_L   0x4C
+#define VK_M   0x4D
+#define VK_N   0x4E
+#define VK_O   0x4F
+#define VK_P   0x50
+#define VK_Q   0x51
+#define VK_R   0x52
+#define VK_S   0x53
+#define VK_T   0x54
+#define VK_U   0x55
+#define VK_V   0x56
+#define VK_W   0x57
+#define VK_X   0x58
+#define VK_Y   0x59
+#define VK_Z   0x5A
 
 #define SYSTEM_TRAY_ICON_ID     2800 
 #define SYSTEM_TRAY_MENU_EXIT   2801
@@ -148,4 +148,4 @@ void storeClipboard(void);
 
 int registerHotkeys(HWND hwnd);
 
-# endif
+#endif

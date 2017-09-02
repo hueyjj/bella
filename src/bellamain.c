@@ -6,6 +6,7 @@
 #include <time.h>
 #include <Windows.h>
 
+#include "resource.h"
 #include "bella.h"
 
 static TCHAR szWindowClass[] = TEXT("Bella application");  
@@ -26,7 +27,10 @@ static NOTIFYICONDATA initSystemTray()
     nid.uID = SYSTEM_TRAY_ICON_ID;
     nid.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
     nid.uCallbackMessage = WM_TRAYICON;
-    nid.hIcon = (HICON) LoadImage(NULL, TEXT("Happy-face.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+    //nid.hIcon = (HICON) LoadImage(NULL, TEXT("Happy-face.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+    nid.hIcon = (HICON) LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON_BELLA), 
+                                  IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+    printLastError();
     strcpy(nid.szTip, TEXT("bella's program"));
     return nid;
 }
