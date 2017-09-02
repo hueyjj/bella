@@ -186,6 +186,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         {
                             POINT cursorPos;
                             GetCursorPos(&cursorPos);
+                            
+                            SetForegroundWindow(hwnd);
+
                             UINT id = TrackPopupMenu(systemTrayMenu, TPM_RETURNCMD | TPM_NONOTIFY,
                                                           cursorPos.x, cursorPos.y, 0, hWnd, NULL);
                             if (id == SYSTEM_TRAY_MENU_EXIT)
